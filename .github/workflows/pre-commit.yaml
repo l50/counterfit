@@ -4,7 +4,7 @@ name: Pre-Commit
 on:
   pull_request:
   push:
-    branches: [main]
+    branches: [devopsy]
 
 jobs:
   pre-commit:
@@ -21,9 +21,8 @@ jobs:
 
       - name: Install pre-commit dependencies
         run: |
-          # Install shell tools
-          brew install shellcheck
-          brew install shfmt
+          brew install shellcheck \
+            shfmt black pylint shellcheck
 
       - name: Run pre-commit
         uses: pre-commit/action@v2.0.3

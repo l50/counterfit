@@ -6,41 +6,60 @@ on:
     branches: [devopsy]
 
 env:
-  AMI: ${{ secrets.AMI }}
-  INST_NAME: goInstance
-  INST_TYPE: t2.micro
-  SEC_GRP_ID: ${{ secrets.SEC_GRP_ID }}
-  SUBNET_ID: ${{ secrets.SUBNET_ID }}
-  VOLUME_SIZE: 100
-  PUB_IP: true
-  AWS_DEFAULT_REGION: us-west-1
+  PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION: python
 
 jobs:
   tests:
-    name: Run tests - includes pre-commit hooks and determining code coverage %
+    name: Run tests
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        pythonVersion: [3.8.8]
     steps:
       - name: Set up git repository
         uses: actions/checkout@v2
-        # TODO: Use the correct branch
-      
-      - name: Install python for pre-commit
-        uses: actions/setup-python@v2
         with:
-          python-version: "3"
+          ref: attackingRL
 
       - name: Install dependencies
         run: |
-          brew install anaconda \
-          black pylint shellfmt shellcheck
+          sudo apt update
+          sudo apt install -y python3-opengl xvfb
+
+      - name: Anaconda-Action
+        id: step1
+        uses: fdiblen/anaconda-action@master
+        with:
+          env-name: "counterfit"
+          activate-env: True
+
+      - name: Setup test environment
+        run: |
+          #conda init bash
+          source ~/.bashrc
+          #conda create --yes -n counterfit python=3.8.8
+          #conda activate counterfit
+          pip install -r requirements.txt
 
       - name: Setup tmate session
-        #if: ${{ failure() }}
+        if: ${{ failure() }}
+        uses: mxschmitt/action-tmate@v3
+
+      - name: Test install
+        run: |
+          echo 'exit counterfit' | xvfb-run -a python counterfit.py
+          if [[ $? != 0 ]]; then
+              echo "Install of counterfit failed!"
+          fi
+
+      - name: Setup tmate session
+        if: ${{ failure() }}
         uses: mxschmitt/action-tmate@v3
 
       - name: Report failure
         uses: nashmaniac/create-issue-action@v1.1
-        # Only report failures of pushes (PRs have are visible through the Checks section) 
+        # Only report failures of pushes (PRs have are visible through the Checks section)
         # to the default branch
         if: failure() && github.event_name == 'push' && github.ref == 'refs/heads/main'
         with:
