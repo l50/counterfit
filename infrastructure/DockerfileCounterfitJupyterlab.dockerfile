@@ -15,4 +15,4 @@ RUN git clone https://github.com/Azure/counterfit.git \
    && cd ..
 EXPOSE 8888
 EXPOSE 2718
-ENTRYPOINT ["jupyter", "lab", "--ip='0.0.0.0'","--no-browser","--allow-root"] 
+ENTRYPOINT ["jupyter", "lab", "--ip='0.0.0.0'","--no-browser","--allow-root"]

@@ -1,4 +1,5 @@
 # Basic Use
+
 After starting Counterfit you will be greeted with a simple interface,
 
 ```
@@ -14,6 +15,7 @@ After starting Counterfit you will be greeted with a simple interface,
 ```
 
 To view the available targets execute the `list targets` command. Targets are user created classes that represent a prediction endpoint, they can be local or remote. See Targets for more information.
+
 ```
 
 counterfit> list targets
@@ -42,6 +44,7 @@ creditfraud>
 ```
 
 Next, load a framework. To view the available frameworks execute `list frameworks`. The name of the framework and the number of attack available will be displayed. If the number of attacks is 0, no attacks have been loaded. (This can be helpful in debugging loading custom frameworks)
+
 ```
 counterfit> list frameworks
 
@@ -56,7 +59,7 @@ counterfit> list frameworks
 counterfit>
 ```
 
-Load a framework and its attacks into the session with `load`. 
+Load a framework and its attacks into the session with `load`.
 
 ```
 counterfit> load art
@@ -66,7 +69,7 @@ counterfit> load art
 counterfit>
 ```
 
-After a framework is loaded successfully, the attacks under that framework become available for use. Executing `list attacks` before loading a framework will result in a warning. 
+After a framework is loaded successfully, the attacks under that framework become available for use. Executing `list attacks` before loading a framework will result in a warning.
 
 ```
 counterfit> list attacks
@@ -104,7 +107,7 @@ scan is for automation; it has various arguments that control how many iteration
 
 2. Using the `run` command.
 
-`run` on the other hand requires that you add an attack via `use`. After successfully executing the use command, the terminal prompt will change to reflect the active attack. With `run` you get control over each parameter and can set them individually. 
+`run` on the other hand requires that you add an attack via `use`. After successfully executing the use command, the terminal prompt will change to reflect the active attack. With `run` you get control over each parameter and can set them individually.
 
 ```
 creditfraud> use HopSkipJump
@@ -112,7 +115,7 @@ creditfraud> use HopSkipJump
 [+] New HopSkipJump (aad67043) created
 [+] Using aad67043
 
-creditfraud> 
+creditfraud>
 ```
 
 To view the possible parameters to change, execute the `show options`. To change one or more parameters, execute the `set` command with the parameter you want to change as the argument followed by the value. Learn more about options.
@@ -200,7 +203,7 @@ creditfraud>aad67043> run
 creditfraud>aad67043>
 ```
 
-The attack will either complete and print a summary, or complete with an error. Use `save` to write the results or parameters for an attack to disk for later. 
+The attack will either complete and print a summary, or complete with an error. Use `save` to write the results or parameters for an attack to disk for later.
 
 ```
 creditfraud>aad67043> save --parameters
@@ -211,43 +214,46 @@ creditfraud>aad67043> save --parameters
 creditfraud>aad67043>
 ```
 
-
 # Advanced Use
-There is a flow to Counterfit, both in creating targets and in executing attacks. Here we will cover some advanced use cases and show how flexible it can be. You will come to learn that Counterfit does not care how you get traffic back and forth - it only cares outputs are returned to the backend framework in the correct way. 
+
+There is a flow to Counterfit, both in creating targets and in executing attacks. Here we will cover some advanced use cases and show how flexible it can be. You will come to learn that Counterfit does not care how you get traffic back and forth - it only cares outputs are returned to the backend framework in the correct way.
 
 ## Hiding Malicious Queries
+
 Malicious queries look malicious. On some platforms, the predicted image is presented to the ML engineer in a dashboard. If suddenly, the platform starts to receive queries that look like television static, it will set off some alarms. To hide malicious queries, create a function inside `MyTarget` that sends normal traffic to the endpoint and use it in the `__call__` function. The example below shows that for every query the attack algorithm makes, a random number of normal queries will be sent. This ups your traffic but depending on the situation it could be worth it.
 
 ```python
 import random
        ...
-    
+
     def normal_traffic(num_queries):
         for num in range(num_queries):
             random_sample = random.choice(self.X)
             request.post(self.model_endpoint, data=normal_data)
-        return 
+        return
 
     def __call__(self, x):
         sample = x[0].tolist()
-        
+
         num_benign_queries = random.randrange(1,25))
         self.normal_traffic(num_benign_queries)
-        
+
         response = requests.post(self.endpoint, data={"input": sample})
 
         results = response.json()
         cat_proba = results["confidence"]
         not_a_cat_proba = 1-cat_proba
-        
+
         return [cat_proba, not_a_cat_proba]
     ...
- ```
+```
 
 ## Using a Proxy
-Most penetration testing tools can create proxies that allow arbitrary traffic to be passed into an internal network. Counterfit does not require any special configuration for this use case. Simply configure the proxy and point the model_endpoint to the target or proxy - just as you would for RDP or SSH. For example, using the requests library with a socks proxy.  
+
+Most penetration testing tools can create proxies that allow arbitrary traffic to be passed into an internal network. Counterfit does not require any special configuration for this use case. Simply configure the proxy and point the model_endpoint to the target or proxy - just as you would for RDP or SSH. For example, using the requests library with a socks proxy.
 
 ### Python Requests
+
 Setup any proxy you like, then use requests to send traffic to the target.
 
 ```python
@@ -271,11 +277,11 @@ class MyTarget(AbstractTarget):
         session = request_proxy_session()
         response = session.post(self.model_endpoint, data=sample)
         ...
-``` 
+```
 
 ## Sending Inputs and Collecting Outputs from a Different Location
-Write a function to send a query, then write a function to collect the output. Sometimes APIs will provide a redirect or separate URI to collect the results from. The below is a fairly simple example, but we have used this technique to collect from a number of obscure places. 
 
+Write a function to send a query, then write a function to collect the output. Sometimes APIs will provide a redirect or separate URI to collect the results from. The below is a fairly simple example, but we have used this technique to collect from a number of obscure places.
 
 ```python
 
@@ -292,22 +298,23 @@ import requests
 
     def __call__(self, x):
         sample = x[0].tolist()
-        
+
         response = send_query(sample)
         collection_endpoint = response.tojson()['location']
 
         result = collect_result(collection_endpoint)
-        
+
         final_result = result.json()
         cat_proba = results["confidence"]
         not_a_cat_proba = 1-cat_proba
-        
+
         return [cat_proba, not_a_cat_proba]
 
     ...
 ```
 
 ## Adding Startup Commands
+
 At some point you may want to load all frameworks or perform some checks on start. Counterfit uses cmd2 to load a startup script for this exact reason. Create a .counterfit file at the root of the project, Counterfit will execute these commands on start.
 
 ```
@@ -316,11 +323,12 @@ load textattack
 ```
 
 ## Overriding Functions in the Parent Target Class
-You can technically override any of the functions in the parent target class – and you should be careful to not override functions unnecessarily. However, `outputs_to_labels` is one function that could be comfortably overridden for certain scenarios.  
 
-A primary reason to override `outputs_to_labels` is to incorporate any knowledge you have about the decision threshold for a target model.  By default, `outputs_to_labels` in the parent class reports the class with highest confidence as the model output.  For two classes, that corresponds to an implicit threshold of 0.5, for three classes it corresponds to an implicit threshold of 0.3333, etc.
+You can technically override any of the functions in the parent target class – and you should be careful to not override functions unnecessarily. However, `outputs_to_labels` is one function that could be comfortably overridden for certain scenarios.
 
-As an example, suppose you learn through you investigations that a fraud classifier reports `fraudulent` only when confidence score exceeds 0.9.  In this case, you could override `outputs_to_labels` as follows:
+A primary reason to override `outputs_to_labels` is to incorporate any knowledge you have about the decision threshold for a target model. By default, `outputs_to_labels` in the parent class reports the class with highest confidence as the model output. For two classes, that corresponds to an implicit threshold of 0.5, for three classes it corresponds to an implicit threshold of 0.3333, etc.
+
+As an example, suppose you learn through you investigations that a fraud classifier reports `fraudulent` only when confidence score exceeds 0.9. In this case, you could override `outputs_to_labels` as follows:
 
 ```python
 def outputs_to_labels(self, output, threshold=0.9):
@@ -329,9 +337,10 @@ def outputs_to_labels(self, output, threshold=0.9):
 ```
 
 ## Training A Local Model to Attack
+
 Counterfit does not include any of the training functionality from the frameworks that are normally used for whitebox attacks. However, it is still possible to train a model inline and then attack the newly trained model. Put the training code inside the `__init__` function. Beware that the target will fail to load if the `__init__` function fails. Errors should be handled gracefully so that the `reload` command will continue to work.
 
-```python 
+```python
 
 def __init__(self):
   ...

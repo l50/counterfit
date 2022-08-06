@@ -29,7 +29,7 @@
       "metadata": {
         "description": "Port to open on the container and the public IP address."
       }
-    },      
+    },
     "cpuCores": {
       "type": "string",
       "defaultValue": "4.0",
@@ -54,50 +54,42 @@
     "restartPolicy": {
       "type": "string",
       "defaultValue": "always",
-      "allowedValues": [
-        "never",
-        "always",
-        "onfailure"
-      ],
+      "allowedValues": ["never", "always", "onfailure"],
       "metadata": {
         "description": "The behavior of Azure runtime if container has stopped."
       }
     }
   },
   "resources": [
-      {
-          "type": "Microsoft.ContainerInstance/containerGroups",
-          "apiVersion": "2019-12-01",
-          "name": "[parameters('containerGroupName')]",
-          "location": "[parameters('location')]",
-          "properties": {
-              "containers": [
-                  {
-                      "name": "[parameters('containerName')]",
-                      "properties": {
-                          "image": "[parameters('image')]",
-                          "ports": [
-                              {
-                                "port": "[parameters('port')]"
-                              }
-                            ],
-                          "command": [
-                              "tail",
-                              "-f",
-                              "/dev/null"
-                          ],
-                          "resources": {
-                              "requests": {
-                                  "cpu": "[parameters('cpuCores')]",
-                                  "memoryInGb": "[parameters('memoryInGb')]"
-                              }
-                          }
-                      }
-                  }
+    {
+      "type": "Microsoft.ContainerInstance/containerGroups",
+      "apiVersion": "2019-12-01",
+      "name": "[parameters('containerGroupName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "containers": [
+          {
+            "name": "[parameters('containerName')]",
+            "properties": {
+              "image": "[parameters('image')]",
+              "ports": [
+                {
+                  "port": "[parameters('port')]"
+                }
               ],
-              "osType": "Linux",
-              "restartPolicy": "[parameters('restartPolicy')]"
+              "command": ["tail", "-f", "/dev/null"],
+              "resources": {
+                "requests": {
+                  "cpu": "[parameters('cpuCores')]",
+                  "memoryInGb": "[parameters('memoryInGb')]"
+                }
+              }
+            }
           }
+        ],
+        "osType": "Linux",
+        "restartPolicy": "[parameters('restartPolicy')]"
       }
+    }
   ]
 }

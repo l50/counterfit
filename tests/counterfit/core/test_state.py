@@ -8,8 +8,7 @@ from counterfit.core.frameworks import Framework
 
 
 class TestCFState:
-
-    @pytest.fixture(scope='function')
+    @pytest.fixture(scope="function")
     def cfstate_state(self):
         cfstate = CFState.state()
         return cfstate
@@ -20,8 +19,7 @@ class TestCFState:
         assert a == b
 
     def test_import_frameworks(self, cfstate_state):
-        cfstate_state.import_frameworks(
-            frameworks_path="counterfit/frameworks")
+        cfstate_state.import_frameworks(frameworks_path="counterfit/frameworks")
         assert len(cfstate_state.frameworks) > 0
 
     def test_add_framework(self, cfstate_state):
@@ -29,8 +27,7 @@ class TestCFState:
         assert "test" in cfstate_state.frameworks.keys()
 
     def test_load_framework(self, cfstate_state):
-        cfstate_state.load_framework(
-            framework="art", force_no_config=False)
+        cfstate_state.load_framework(framework="art", force_no_config=False)
         assert cfstate_state.frameworks["art"].attacks is not None
 
     def test_get_frameworks(self, cfstate_state):
@@ -76,6 +73,6 @@ class TestCFState:
         pass
 
     def test_set_active_target(self, cfstate_state):
-        cfstate_state.targets['TEMP_target_name'] = Mock()
+        cfstate_state.targets["TEMP_target_name"] = Mock()
         cfstate_state.set_active_target(Mock)
         assert cfstate_state.active_target == Mock

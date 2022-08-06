@@ -27,9 +27,7 @@ def run_test(framework, targets, attacks=None):
             for attack in attacks:
                 try:
                     attack_id = CFState.state().build_new_attack(
-                        target_name=target,
-                        attack_name=attack,
-                        scan_id="test"
+                        target_name=target, attack_name=attack, scan_id="test"
                     )
 
                     results[target]["build"][attack] = "success"
@@ -48,8 +46,7 @@ def run_test(framework, targets, attacks=None):
 
 
 def print_results(results):
-    table = Table(header_style="bold magenta",
-                  title="Test Results (pass/fail)")
+    table = Table(header_style="bold magenta", title="Test Results (pass/fail)")
     table.add_column("Target", no_wrap=True)
     table.add_column("Build", no_wrap=True)
     table.add_column("Run", no_wrap=True)
@@ -80,8 +77,7 @@ def main(args):
         test_set = json.load(f)
 
     results = run_test(
-        framework=args.framework,
-        targets=test_set[args.framework]["targets"]
+        framework=args.framework, targets=test_set[args.framework]["targets"]
     )
 
     print_results(results)
@@ -90,9 +86,11 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "-c", "--config_file", help="the config file to use", default="tests/tests.json")
-    parser.add_argument("-f", "--framework",
-                        help="the framework to test", required=True)
+        "-c", "--config_file", help="the config file to use", default="tests/tests.json"
+    )
+    parser.add_argument(
+        "-f", "--framework", help="the framework to test", required=True
+    )
 
     args = parser.parse_args()
     main(args)

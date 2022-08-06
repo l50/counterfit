@@ -2,13 +2,13 @@ import pytest
 from counterfit.core.state import CFState
 from counterfit.core.utils import set_id
 
-class TestAuglyFramework:
 
+class TestAuglyFramework:
     @pytest.fixture(params=["satellite", "digits_keras", "digits_blackbox"])
     def target(self, request):
         yield request.param
 
-    @pytest.fixture(scope='function')
+    @pytest.fixture(scope="function")
     def cfstate_state(self, target):
         cfstate = CFState.state()
         cfstate._init_state()
@@ -23,4 +23,3 @@ class TestAuglyFramework:
 
         attack_complete = cfstate_state.run_attack(target, cfattack_id)
         assert attack_complete is True
-

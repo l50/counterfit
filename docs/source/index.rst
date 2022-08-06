@@ -33,12 +33,12 @@
 
 .. toctree::
    :hidden:
-   :caption: API Docs 
-   
+   :caption: API Docs
+
    API Docs <api.rst>
 
 .. toctree::
    :hidden:
-   :caption: FAQ 
-   
+   :caption: FAQ
+
    FAQ <faq/faq.md>

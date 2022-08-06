@@ -1,7 +1,9 @@
 # Write a New Target
-Targets are the reason we're all here. Targets represent an arbitrary prediction endpoint, somewhere Counterfot can submit inputs and get a response. Like other objects in Counterfit, targets should inherit from a baseclass `counterfit.core.targets.Target`. 
+
+Targets are the reason we're all here. Targets represent an arbitrary prediction endpoint, somewhere Counterfot can submit inputs and get a response. Like other objects in Counterfit, targets should inherit from a baseclass `counterfit.core.targets.Target`.
 
 ## Create the Target
+
 1. Start Counterfit
 2. Execute the `new` command and follow the prompts.
 3. Open the new target file in a text editor.
@@ -46,10 +48,10 @@ Anytime you make a change to a target, execute `reload --target` to load the new
 
 6. Go into the `counterfit/targets/digits_blackbox` folder, and copy both `mnist_784.npz` and `mnist_sklearn_pipeline.pkl` into `counterfit/targets/newtarget` folder.
 
-Great. We have a local model and some data. Counterfit expects a target to provide some information about a target. Counterfit uses this information to populate the interface, and attacks use the information to correctly reshape inputs. 
-
+Great. We have a local model and some data. Counterfit expects a target to provide some information about a target. Counterfit uses this information to populate the interface, and attacks use the information to correctly reshape inputs.
 
 ## Create a Local Target
+
 7. Go ahead a fill out the `NewTarget` with the following information,
 
 ```python
@@ -63,15 +65,14 @@ class Newtarget(Target):
     X = []
 ```
 
-Here is a quick recap of each property, 
+Here is a quick recap of each property,
 
 - `target_name` and `target_data_type` were selected during target creation. These are used to identify the target in the interface, and match relevant attacks to the target.
 - `target_endpoint` is where Counterfit should submit inputs.
 - `target_input_shape` is used by frameworks, or the target to reshape data appropriately if needed.
-- `target_output_classes` are the known labels of the target endpoint, at a minimum these are `[0, 1]` (is not a thing, is a thing). 
-- `target_classifier` is a conveience property that can be used by a framework to further integrate. 
+- `target_output_classes` are the known labels of the target endpoint, at a minimum these are `[0, 1]` (is not a thing, is a thing).
+- `target_classifier` is a conveience property that can be used by a framework to further integrate.
 - `X` is a place holder for sample data.
-
 
 The first function targets are required to implement is a `load()` function. This function is called when a user executes the `interact` command. It should load models, data, or anything else required. Since we're using a local model, this is straight forward.
 
@@ -95,9 +96,9 @@ import pickle
 import numpy as np
 ```
 
-Finally, it's time to write the `predict` function. The predict function will recieve an input from an attack algorithm and should submit it to the `target_endpoint`, then return a list of proabilities. These probabilities are required for attack algorithms to work properly. However, while algorithms work with arrays of numbers, targets found in-the-wild take actual images, blocks of text, or some other array of abstract properties. Which means additional processing inside the `predict` function could be necessary, as you will see later in this guide. For now, we'll continue with the local model. 
+Finally, it's time to write the `predict` function. The predict function will recieve an input from an attack algorithm and should submit it to the `target_endpoint`, then return a list of proabilities. These probabilities are required for attack algorithms to work properly. However, while algorithms work with arrays of numbers, targets found in-the-wild take actual images, blocks of text, or some other array of abstract properties. Which means additional processing inside the `predict` function could be necessary, as you will see later in this guide. For now, we'll continue with the local model.
 
-9. Replace the `predict` function with the following, 
+9. Replace the `predict` function with the following,
 
 ```python
     def predict(self, x):
@@ -106,10 +107,11 @@ Finally, it's time to write the `predict` function. The predict function will re
         # return a list of class probabilities; each row must be the same length as target_output_classes
         return scores.tolist() # []
 ```
- 
+
 Once again, `reload --target` to load the latest changes. Next, test the `predict` function and execute the `predict -i 0` command. This command sends a single sample to the `target_endpoint`. If you are happy with the inputs and outputs, you are ready to scan. Next, lets host the model on a web endpoint.
 
 ## Create an Online Target
+
 1. Replace the current target with this new one.
 
 ```python
@@ -179,7 +181,7 @@ class ModelServer:
 
         app = Flask(__name__)
         @app.route('/score', methods=["POST"])
-        def score():            
+        def score():
             image_data = request.json
             image_bytes = base64.b64decode(image_data["image"])
             image_file = BytesIO(image_bytes)
@@ -188,7 +190,7 @@ class ModelServer:
 
             scores = self.predict(image_array)
             return json.dumps(scores)
-            
+
         app.run(port=8080)
 
 
@@ -203,14 +205,11 @@ model = ModelServer("./mnist_sklearn_pipeline.pkl")
 model.start_server()
 ```
 
-
-
-
 # Write a new Framework
+
 A major component of Counterfit is a framework. If you want to redefine, wrap, or create a new framework knowing how Counterfit handles frameworks is important. Before we start, it is important to note that Counterfit is not a framework, frameworks exist outside of Counterfit. While you go through this tutorial, it will think of your framework as separate from Counterfit.
 
-A framework is really just a container for attack algos. In the case of Augly, Adversarial Robustness Toolbox, and TextAttack, you load the relevant attack class from whatever module it lives in. For example, to load the `HopSkipJump` attack, loading code should find `art.attacks.evasion.hop_skip_jump.HopSkipJump`. Similarly for TextAttack, to load the `DeepWordBug` attack, loading code should find `textattack.attack_recipes.deepwordbug_gao_2018.DeepWordBugGao2018`. Fortunately, most frameworks implement attacks by extending some base class, which makes finding the in a module much easier. The easiest however, is to load a module you write yourself! 
-
+A framework is really just a container for attack algos. In the case of Augly, Adversarial Robustness Toolbox, and TextAttack, you load the relevant attack class from whatever module it lives in. For example, to load the `HopSkipJump` attack, loading code should find `art.attacks.evasion.hop_skip_jump.HopSkipJump`. Similarly for TextAttack, to load the `DeepWordBug` attack, loading code should find `textattack.attack_recipes.deepwordbug_gao_2018.DeepWordBugGao2018`. Fortunately, most frameworks implement attacks by extending some base class, which makes finding the in a module much easier. The easiest however, is to load a module you write yourself!
 
 1. Create a new `custom` folder under `counterfit/frameworks`. In that folder, create a new `custom.py` file.
 2. Add a `CustomAttack` class.
@@ -239,12 +238,12 @@ class CustomAttack:
             print(output)
 ```
 
-Now that we have a base attack to work with, we can build wrap into Counterfit. 
+Now that we have a base attack to work with, we can build wrap into Counterfit.
 
 2. Import the parent class `from counterfit.core.frameworks import Framework`.
-3. Write a new `CustomFramework` class. 
+3. Write a new `CustomFramework` class.
 
-``` python
+```python
 from counterfit.core.frameworks import Framework
 
 class CustomFramework(Framework):
@@ -261,12 +260,12 @@ class CustomFramework(Framework):
         pass
 ```
 
-Frameworks require you implement a number of functions. These functions have mirrored functions in `CFState` that the interface uses. For example, when a user executes `load custom`, it calls into `CFState.state().load_framework`, which in turn calls `CustomFramework.load()`. Build and run are similar, 
+Frameworks require you implement a number of functions. These functions have mirrored functions in `CFState` that the interface uses. For example, when a user executes `load custom`, it calls into `CFState.state().load_framework`, which in turn calls `CustomFramework.load()`. Build and run are similar,
 
 - `use custom` -> `CFState.state().build_new_attack()` -> `CustomFramework.build()`
 - `run` -> `CFState.state().run_attack()` -> `CustomFramework.run()`
 
-In this case loading the attack is simple as it lives in the same file as the framework. To add an attack to a framework, use the `add_attack` function with the required parameters. Ensure arguments are of the right type. 
+In this case loading the attack is simple as it lives in the same file as the framework. To add an attack to a framework, use the `add_attack` function with the required parameters. Ensure arguments are of the right type.
 
 5. Replace the `load()` function with the below function,
 
@@ -284,17 +283,17 @@ In this case loading the attack is simple as it lives in the same file as the fr
 
 `add_attack` loads all the information into a `namedtuple`. This is an immutable structure and ensure users can't accidently change something after loading a framework. Counterfit also uses this information in the terminal.
 
-Next, the framework should `build()` the attack. This function should return an attack ready to run. 
+Next, the framework should `build()` the attack. This function should return an attack ready to run.
 
-```python 
+```python
     def build(self, target, attack):
         new_attack = attack(target.predict)
         return new_attack
 ```
 
-The returned attack is wrapped into a `CFAttack` object. `CFAttack` is an aggregation that is used for the rest of the attack lifecycle. It contains `CFAttackOptions`, a reference to the target, initial samples, and other important items. 
+The returned attack is wrapped into a `CFAttack` object. `CFAttack` is an aggregation that is used for the rest of the attack lifecycle. It contains `CFAttackOptions`, a reference to the target, initial samples, and other important items.
 
-A framework should impement a `run` function. This function should execute the attack. The restults are stored in the `CFAttack` for reference later. 
+A framework should impement a `run` function. This function should execute the attack. The restults are stored in the `CFAttack` for reference later.
 
 ```python
     def run(self, cfattack):
@@ -302,7 +301,7 @@ A framework should impement a `run` function. This function should execute the a
         return results
 ```
 
-Finally, a framework should implement a `check_success` function. This function should return a bool value indicating whether or not the attack was successful. 
+Finally, a framework should implement a `check_success` function. This function should return a bool value indicating whether or not the attack was successful.
 
 ```python
     def check_success(self, cfattack):
@@ -315,17 +314,16 @@ Finally, a framework should implement a `check_success` function. This function 
         return False
 ```
 
-Given that the attack doesn't actually make any changes to the inputs, we expect this to fail. 
-
-
+Given that the attack doesn't actually make any changes to the inputs, we expect this to fail.
 
 # Add a Command
-Counterfit defines a number of basic commands that are kept in `counterfit/commands`. Commands are addded to the terminal (`counterfit.core.terminal.Terminal`) during startup. Users are encouraged to add custom commands, redefine other commands, etc. For this tutorial we will create a `target` command to define target interactions. The steps are the same for all new commands, 
+
+Counterfit defines a number of basic commands that are kept in `counterfit/commands`. Commands are addded to the terminal (`counterfit.core.terminal.Terminal`) during startup. Users are encouraged to add custom commands, redefine other commands, etc. For this tutorial we will create a `target` command to define target interactions. The steps are the same for all new commands,
 
 1. Create a `target.py` file in `counterfit/commands`.
 2. Add the required imports.
 3. Add the cmd2 decorators.
-3. Write the `do_target` logic.
+4. Write the `do_target` logic.
 
 Before writing the `do_target` logic, the `target` command should look like the following,
 
@@ -358,18 +356,18 @@ def do_target(self, args: argparse.Namespace) -> None:
 
 Finally, use `reload --commands` to reload the `target` command into the session, then execute `targets -l`. You should see a list of targets displayed in the terminal.
 
-
 # Write a New Logger
+
 Loggers like every other object in Counterfit are loaded based on their parent class. Logging is a fairly simple task
 
-1. Open `counterfit/logging/logging.py`. There are 3 basic classes ready for use, `DefaultLogger`, `ListLogger`, and a `JSONLogger`. 
-2. Copy the `DefaultLogger` class and paste it at the bottom of the file. 
-3. Make basic changes to the new logger, 
-    - Import `csv` module at the top of the file.
-    - Change the class to `CSVLogger`
-    - Update the description.
+1. Open `counterfit/logging/logging.py`. There are 3 basic classes ready for use, `DefaultLogger`, `ListLogger`, and a `JSONLogger`.
+2. Copy the `DefaultLogger` class and paste it at the bottom of the file.
+3. Make basic changes to the new logger,
+   - Import `csv` module at the top of the file.
+   - Change the class to `CSVLogger`
+   - Update the description.
 
-Your new `CSVLogger` should look like the following, 
+Your new `CSVLogger` should look like the following,
 
 ```python
 import csv
@@ -385,7 +383,7 @@ class CSVLogger(CFAttackLogger):
         self.num_queries += 1
 ```
 
-Before we implement the logic to actually write logs to a CSV file. First, let's get an idea of what is sent to the logger. The `predict_wrapper` function in `counterfit/core/targets.py` is responsible for logging, all target `predict` functions are wrapped into this function for logging (or other custom logic required by the user). Looking at the `log_entry` dictionary we can see the values sent to the logger, additional values could be added if needed. 
+Before we implement the logic to actually write logs to a CSV file. First, let's get an idea of what is sent to the logger. The `predict_wrapper` function in `counterfit/core/targets.py` is responsible for logging, all target `predict` functions are wrapped into this function for logging (or other custom logic required by the user). Looking at the `log_entry` dictionary we can see the values sent to the logger, additional values could be added if needed.
 
 - `timestamp`
 - `input`
@@ -418,8 +416,8 @@ def predict_wrapper(self, x, **kwargs):
 
 Back to our `CSVLogger`.
 
-1. Update the __init__ function to take and store a  `filename` property.
-2. Update the __call__ function to write an entry to the output file.
+1. Update the **init** function to take and store a `filename` property.
+2. Update the **call** function to write an entry to the output file.
 3. Make sure to serialize numpy outputs with `orjson`.
 
 ```python
@@ -463,6 +461,7 @@ class CSVLogger(CFAttackLogger):
 ```
 
 The last change to make before testing is to update `attack_logger_obj_map` in the `get_attack_logger_obj` factory funtion. Simply add `CSVLogger` to the `attack_logger_obj_map` dictionary.
+
 ```python
     attack_logger_obj_map = {
         'default': DefaultLogger,

@@ -13,7 +13,7 @@ For more information, see `notebooks/README`.
 # Building this HTML doc set locally
 
 You can clone this repo and build and view the API and tutorial documentation locally:
-   
+
 1. Change to the `docs` directory:
 
    `cd docs`
@@ -32,4 +32,4 @@ You can clone this repo and build and view the API and tutorial documentation lo
 
 5. View the doc set locally in a browser at:
 
-   http://localhost:8000/_build/html/
+   http://localhost:8000/\_build/html/

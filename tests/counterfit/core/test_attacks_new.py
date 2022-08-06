@@ -4,16 +4,9 @@ from counterfit.core.attacks import CFAttackOptions
 
 
 def test_cfattack_options():
-    sample_options = {
-        "option_int": 1,
-        "option_float": 1.0,
-        "option_str": "hello"
-    }
+    sample_options = {"option_int": 1, "option_float": 1.0, "option_str": "hello"}
 
-    cfattack_options = {
-        "sample_index": 0,
-        "logger": "default"
-    }
+    cfattack_options = {"sample_index": 0, "logger": "default"}
 
     default_options_list = list(sample_options.keys())
     cfattack_options_list = list(cfattack_options.keys())
@@ -29,16 +22,9 @@ def test_cfattack_options():
 
 
 def test_cfattack_get_default_options():
-    sample_options = {
-        "option_int": 1,
-        "option_float": 1.0,
-        "option_str": "hello"
-    }
+    sample_options = {"option_int": 1, "option_float": 1.0, "option_str": "hello"}
 
-    cfattack_options = {
-        "sample_index": 0,
-        "logger": "default"
-    }
+    cfattack_options = {"sample_index": 0, "logger": "default"}
 
     default_options_list = list(sample_options.keys())
     cfattack_options_list = list(cfattack_options.keys())
@@ -56,16 +42,9 @@ def test_cfattack_get_default_options():
 
 
 def test_cfattack_get_current_options():
-    sample_options = {
-        "option_int": 1,
-        "option_float": 1.0,
-        "option_str": "hello"
-    }
+    sample_options = {"option_int": 1, "option_float": 1.0, "option_str": "hello"}
 
-    cfattack_options = {
-        "sample_index": 0,
-        "logger": "default"
-    }
+    cfattack_options = {"sample_index": 0, "logger": "default"}
 
     default_options_list = list(sample_options.keys())
     cfattack_options_list = list(cfattack_options.keys())
@@ -84,16 +63,9 @@ def test_cfattack_get_current_options():
 
 
 def test_cfattack_get_all_options():
-    sample_options = {
-        "option_int": 1,
-        "option_float": 1.0,
-        "option_str": "hello"
-    }
+    sample_options = {"option_int": 1, "option_float": 1.0, "option_str": "hello"}
 
-    cfattack_options = {
-        "sample_index": 0,
-        "logger": "default"
-    }
+    cfattack_options = {"sample_index": 0, "logger": "default"}
 
     default_options_list = list(sample_options.keys())
     cfattack_options_list = list(cfattack_options.keys())
@@ -111,16 +83,9 @@ def test_cfattack_get_all_options():
 
 
 def test_cfattack_save_previous_options():
-    sample_options = {
-        "option_int": 1,
-        "option_float": 1.0,
-        "option_str": "hello"
-    }
+    sample_options = {"option_int": 1, "option_float": 1.0, "option_str": "hello"}
 
-    cfattack_options = {
-        "sample_index": 0,
-        "logger": "default"
-    }
+    cfattack_options = {"sample_index": 0, "logger": "default"}
 
     default_options_list = list(sample_options.keys())
     cfattack_options_list = list(cfattack_options.keys())
