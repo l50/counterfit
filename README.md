@@ -251,9 +251,23 @@ It is possible to use the cmd2 `run_pyscript` to automate scans.
 Tests are implement via Pytest and make docs with `counterfit\docs\make html`.
 Use the `docs` command to start a local server for browsing.
 
+## Pre-commit hooks
+
 The pre-commit hooks require several tools that can be
 installed with brew:
 
 ```bash
-brew install black pylint shellfmt shellcheck
+brew install pre-commit black pylint shellfmt shellcheck
+```
+
+With those in place, you can install it locally:
+
+```bash
+pre-commit install
+```
+
+To run all of the hooks against the current deployment:
+
+```bash
+pre-commit run --all-files
 ```
